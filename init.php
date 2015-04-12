@@ -3,11 +3,11 @@
  * Plugin Name: Basic User Avatars
  * Plugin URI:  http://wordpress.org/extend/basic-user-avatars
  * Description: Adds an avatar upload field to user profiles. Also provides front-end avatar management via a shortcode and bbPress support. No frills. Fork of Simple Local Avatars 1.3.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      Jared Atchison
  * Author URI:  http://jaredatchison.com
  *
- * ----------------------------------------------------------------------------//
+ * ---------------------------------------------------------------------------//
  * This plugin is a fork of Simple Local Avatars v1.3.1 by Jake Goldman (10up).
  *
  * Orignal author url:  http://get10up.com
@@ -15,7 +15,7 @@
  *
  * If you want some snazzy ajax and some other nifty features, check out Simple
  * Local Avatars 2.0+
- * ----------------------------------------------------------------------------//
+ * ---------------------------------------------------------------------------//
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,16 +27,25 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ * You should have received a copy of the GNU General Public License
+ * along with WP Forms. If not, see <http://www.gnu.org/licenses/>.
+ *
  * @author     Jared Atchison
- * @version    1.0.0
+ * @version    1.0.1
  * @package    JA_BasicLocalAvatars
- * @copyright  Copyright (c) 2013, Jared Atchison
+ * @copyright  Copyright (c) 2015, Jared Atchison
  * @link       http://jaredatchison.com
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 class basic_user_avatars {
 
+	/**
+	 * User ID
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
 	private $user_id_being_edited;
 
 	/**
@@ -45,6 +54,9 @@ class basic_user_avatars {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
+
+		// Text domain
+		$this->load_textdomain();
 
 		// Actions
 		add_action( 'admin_init',                array( $this, 'admin_init'               )        );
@@ -60,7 +72,18 @@ class basic_user_avatars {
 		// Filters
 		add_filter( 'get_avatar',                array( $this, 'get_avatar'               ), 10, 5 );
 		add_filter( 'avatar_defaults',           array( $this, 'avatar_defaults'          )        );
+	}
 
+	/**
+	 * Loads the plugin language files.
+	 *
+	 * @since 1.0.1
+	 */
+	public function load_textdomain() {
+		$domain = 'basic-user-avatars';
+		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
+		load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
+		load_plugin_textdomain( $domain, false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 	/**
@@ -69,9 +92,6 @@ class basic_user_avatars {
 	 * @since 1.0.0
 	 */
 	public function admin_init() {
-
-		// Load the textdomain so we can support other languages
-		load_plugin_textdomain( 'basic-user-avatars', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 		// Register/add the Discussion setting to restrict avatar upload capabilites
 		register_setting( 'discussion', 'basic_user_avatars_caps', array( $this, 'sanitize_options' ) );
